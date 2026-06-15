@@ -1,0 +1,48 @@
+import psycopg2
+import pandas as pd
+from sqlalchemy import create_engine #modern setup
+
+conn = psycopg2.connect(
+    host="localhost",
+    database="demo_db",
+    user="postgres",
+    password="Prakash@123",
+    port=5432
+)
+
+cur = conn.cursor()
+
+print("Connection successful!")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    department VARCHAR(50),
+    salary INT
+)
+""")
+
+conn.commit()
+print("Table created")
+cur.execute("""
+INSERT INTO employees (name, department, salary)
+VALUES ('Alice', 'IT', 80000)
+""")
+
+conn.commit()
+print("Data inserted")
+cur.execute("SELECT * FROM employees")
+
+rows = cur.fetchall()
+
+for row in rows:
+    print(row)
+
+
+engine = create_engine(
+    "postgresql+psycopg2://postgres:Prakash%40123@localhost:5432/demo_db"
+)
+
+df = pd.read_sql("SELECT * FROM employees", engine)
+print(df)
