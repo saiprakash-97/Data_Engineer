@@ -46,3 +46,5 @@ engine = create_engine(
 
 df = pd.read_sql("SELECT * FROM employees", engine)
 print(df)
+conn.close()
+print('Database closed')
