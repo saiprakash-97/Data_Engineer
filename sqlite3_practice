@@ -1,0 +1,106 @@
+import sqlite3
+
+conn = sqlite3.connect("customers.db")
+cur=conn.cursor()
+print("database connected")
+cur.execute('''
+            create table if not exists customers
+           ( customer_id int primary key,
+            customer_name text,
+            city text )
+''')
+cur.execute('''
+            create table if not exists orders
+            (order_id int primary key,
+            customer_id int,
+            amount int,
+            foreign key(customer_id)
+            references customers(customer_id))
+            ''')
+customer_data =[
+            (1,'John','New York'),
+            (2,'Alice','Chicago'),
+            (3,'Bob','Dallas'),
+            (4,'David','Miami')]
+orders_data = [
+            (101,1,250),
+            (102,1,300),
+            (103,2,150),
+            (104,3,400),
+            (105,3,200)
+]
+cur.executemany(''' insert into customers values(?,?,?)''',customer_data)
+#cur.execute(''' select * from customers''')
+#for customer in cur.fetchall():
+#    print(customer)
+cur.executemany('''insert into orders values(?,?,?)''',orders_data)
+#cur.execute('''select * from orders''')
+#for order in cur.fetchall():
+#    print(order)
+conn.commit()
+print('Inner join: ')
+cur.execute('''
+            select c.customer_name,c.city,o.order_id,o.amount
+            from customers c ,orders o
+            where c.customer_id=o.customer_id
+            ''')    
+for i in cur.fetchall():
+    print(i)
+print('Using left Join: ')
+cur.execute('''
+            select c.customer_name,c.city,o.order_id,o.amount
+            from customers c
+            left join orders o
+            on c.customer_id=o.customer_id
+            ''')
+for i in cur.fetchall():
+    print(i)
+print('Total customer spending')
+cur.execute('''
+select c.customer_name,sum(o.amount)
+        from customers c
+        inner join orders o
+        on c.customer_id=o.customer_id
+        group by c.customer_name
+''')
+for i in cur.fetchall():
+    print(i)
+print('customer with highest spending')
+cur.execute('''
+            select customer_name,max(money_spent) from
+            (select c.customer_name,sum(o.amount) as money_spent
+            from customers c,orders o
+            where c.customer_id=o.customer_id
+            group by c.customer_name)
+            ''')
+for i in cur.fetchall():
+    print(i)
+print('customer who spent more than 500')
+cur.execute('''
+            select c.customer_name,sum(o.amount) as money_spent
+            from customers c,orders o
+            where c.customer_id=o.customer_id
+            group by customer_name
+            having money_spent > 500
+            ''')
+for i in cur.fetchall():
+    print(i)
+print('order above average spending')
+cur.execute('''
+            select order_id,amount
+            from orders
+            where amount >
+            (select avg(amount) from orders)
+            ''')
+for i in cur.fetchall():
+    print(i)
+print('city_wise revenue')
+cur.execute('''
+            select c.city,sum(o.amount)
+            from customers c,orders o
+            where c.customer_id=o.customer_id
+            group by c.city
+            ''')
+for i in cur.fetchall():
+    print(i)
+conn.close()  
