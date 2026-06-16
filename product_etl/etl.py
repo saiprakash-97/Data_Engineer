@@ -73,10 +73,10 @@ def main():
         print(f"{name}")
         print(read_df)
         results[name]=read_df
-    results['gender_distribution'].to_csv("gender_distribution.csv",index=False)
-    results['average_age_by_gender'].to_csv("average_age_by_gender.csv",index=False)
-    results['top_10_oldest_users'].to_csv("top_10_oldest_users.csv",index=False)
-    results['users_by_state'].to_csv("users_by_state.csv",index=False)
+    results['gender_distribution'].to_csv("product_etl/gender_distribution.csv",index=False)
+    results['average_age_by_gender'].to_csv("product_etl/average_age_by_gender.csv",index=False)
+    results['top_10_oldest_users'].to_csv("product_etl/top_10_oldest_users.csv",index=False)
+    results['users_by_state'].to_csv("product_etl/users_by_state.csv",index=False)
     conn.close()
 main()
 
