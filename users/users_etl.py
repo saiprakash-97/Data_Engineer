@@ -1,10 +1,9 @@
 import requests 
 import pandas as pd
-import psycopg2 
 from sqlalchemy import create_engine
 
 engine = create_engine(
-    "postgresql+psycopg2://postgres:Prakash%40123@localhost:5432/demo_db"
+    "postgresql://postgres:Prakash%40123@localhost:5432/demo_db"
     )
 
 def extract_data():
@@ -29,20 +28,12 @@ def transform_data(data):
     return final_df
 
 def load_data(final_df):
-    conn = psycopg2.connect(
-    host="localhost",
-    database="demo_db",
-    user="postgres",
-    password="Prakash@123",
-    port=5432
-    )
-    
-    final_df.to_sql("users",
+     final_df.to_sql("users",
                     engine,
                     if_exists="replace",
                     index=False) 
-    print("data loaded into postgresql")
-    return conn
+     print("data loaded into postgresql")
+
     
 
 def analyze_data():
@@ -81,7 +72,7 @@ def analyze_data():
 def main():
     data = extract_data()
     df=transform_data(data)
-    conn=load_data(df)
+    load_data(df)
     queries = analyze_data()
     results={}
 
@@ -92,6 +83,5 @@ def main():
         results[name]=read_df
     for name,df in results.items():
         df.to_csv(f"users/{name}.csv",index=False)
-    conn.close()
     engine.dispose()
 main()
